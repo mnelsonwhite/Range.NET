@@ -1,4 +1,5 @@
 ﻿# Range.NET
+[![Build Status](https://atlanticblue.visualstudio.com/Range.NET/_apis/build/status/mnelsonwhite.Range.NET?branchName=master)](https://atlanticblue.visualstudio.com/Range.NET/_build/latest?definitionId=2&branchName=master)
 
 Range allows comparable types to be used as a range.
 
