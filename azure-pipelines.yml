@@ -21,3 +21,18 @@ steps:
     command: 'test'
     projects: '**/*.csproj'
     testRunTitle: 'All Tests'
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: 'src/Range.Net/*.csproj'
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'pack'
+    packagesToPack: 'src/Range.Net/*.csproj'
+    versioningScheme: 'byBuildNumber'
+- task: NuGetCommand@2
+  inputs:
+    command: 'push'
+    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
+    nuGetFeedType: 'internal'
+    publishVstsFeed: '/4b4da940-c7e7-47da-bcab-95675f3c0e84'
