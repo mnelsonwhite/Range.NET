@@ -12,11 +12,8 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <NeutralLanguage>en-AU</NeutralLanguage>
+    <Version>1.1.0</Version>
   </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Range.Net.Abstractions\Range.Net.Abstractions.csproj" />
-  </ItemGroup>
 
   <ItemGroup>
     <None Include="..\..\LICENSE">
