@@ -111,68 +111,6 @@ namespace Range.Net.Tests
             Assert.Equal(expected, actual);
         }
 
-        [Theory]
-        [InlineData(
-            RangeInclusivity.ExclusiveMinExclusiveMax,
-            "e => ((e.Date > 1/01/2001 12:00:00 AM) And (e.Date < 3/01/2001 12:00:00 AM))")]
-        [InlineData(
-            RangeInclusivity.InclusiveMinExclusiveMax,
-            "e => ((e.Date >= 1/01/2001 12:00:00 AM) And (e.Date < 3/01/2001 12:00:00 AM))")]
-        [InlineData(
-            RangeInclusivity.ExclusiveMinInclusiveMax,
-            "e => ((e.Date > 1/01/2001 12:00:00 AM) And (e.Date <= 3/01/2001 12:00:00 AM))")]
-        [InlineData(
-            RangeInclusivity.InclusiveMinInclusiveMax,
-            "e => ((e.Date >= 1/01/2001 12:00:00 AM) And (e.Date <= 3/01/2001 12:00:00 AM))")]
-        public void WhenRangeExclusivity_ShouldBeExpectedExpression(
-            RangeInclusivity inclusivity,
-            string expected)
-        {
-            // Arrange
-            var range = new Range<DateTime>(new DateTime(2001, 1, 1), new DateTime(2001, 1, 3))
-            {
-                Inclusivity = inclusivity
-            };
-
-            // Act
-            var expr = _values.FilterExpressionByRange(e => e.Date, range);
-            var actual = expr.ToString();
-
-            // Assert
-            Assert.Equal(expected, actual);
-        }
-
-        [Theory]
-        [InlineData(
-            RangeInclusivity.ExclusiveMinExclusiveMax,
-            "e => ((e.NullableDate.Value > 1/01/2001 12:00:00 AM) And (e.NullableDate.Value < 3/01/2001 12:00:00 AM))")]
-        [InlineData(
-            RangeInclusivity.InclusiveMinExclusiveMax,
-            "e => ((e.NullableDate.Value >= 1/01/2001 12:00:00 AM) And (e.NullableDate.Value < 3/01/2001 12:00:00 AM))")]
-        [InlineData(
-            RangeInclusivity.ExclusiveMinInclusiveMax,
-            "e => ((e.NullableDate.Value > 1/01/2001 12:00:00 AM) And (e.NullableDate.Value <= 3/01/2001 12:00:00 AM))")]
-        [InlineData(
-            RangeInclusivity.InclusiveMinInclusiveMax,
-            "e => ((e.NullableDate.Value >= 1/01/2001 12:00:00 AM) And (e.NullableDate.Value <= 3/01/2001 12:00:00 AM))")]
-        public void WhenRangeExclusivity_OnNullable_ShouldBeExpectedExpression(
-            RangeInclusivity inclusivity,
-            string expected)
-        {
-            // Arrange
-            var range = new Range<DateTime>(new DateTime(2001, 1, 1), new DateTime(2001, 1, 3))
-            {
-                Inclusivity = inclusivity
-            };
-
-            // Act
-            var expr = _values.FilterExpressionByRange(e => e.NullableDate, range);
-            var actual = expr.ToString();
-
-            // Assert
-            Assert.Equal(expected, actual);
-        }
-
         internal class TestClass
         {
             public DateTime Date { get;set; }
