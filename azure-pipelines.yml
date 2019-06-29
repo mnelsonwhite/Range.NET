@@ -21,3 +21,7 @@ steps:
     command: 'test'
     projects: '**/*.csproj'
     testRunTitle: 'All Tests'
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: 'src/Range.Net/*.csproj'
