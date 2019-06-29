@@ -25,8 +25,3 @@ steps:
   inputs:
     command: 'build'
     projects: 'src/Range.Net/*.csproj'
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'pack'
-    packagesToPack: 'src/Range.Net/*.csproj'
-    versioningScheme: 'byBuildNumber'
