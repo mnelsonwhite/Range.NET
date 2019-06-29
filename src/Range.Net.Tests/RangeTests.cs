@@ -1,4 +1,5 @@
 ﻿using Range.Net.Abstractions;
+using System.Linq;
 using Xunit;
 
 namespace Range.Net.Tests
@@ -218,6 +219,103 @@ namespace Range.Net.Tests
 
             // Assert
             Assert.Equal("[1 - 3]", actual);
+        }
+
+        [Fact]
+        public void WhenCreateNewRange_ShouldBeExpectedMinAndMax()
+        {
+            // Act
+            var range = new Range<int>(1, 10);
+
+            // Assert
+            Assert.Equal(1, range.Minimum);
+            Assert.Equal(10, range.Maximum);
+        }
+
+        [Fact]
+        public void WhenRangeContainsValue_ShouldBeExpected()
+        {
+            // Arrange
+            var range = new Range<int>(1, 10);
+
+            // Act Assert
+            Assert.True(range.Contains(1));
+            Assert.True(range.Contains(3));
+            Assert.True(range.Contains(10));
+            Assert.False(range.Contains(0));
+            Assert.False(range.Contains(11));
+        }
+
+        [Fact]
+        public void WhenRangeIntersectsWithAnother_ShouldBeExpected()
+        {
+            // Arrange
+            var range = new Range<int>(1, 10);
+
+            // Act Assert
+            Assert.True(range.Intersects(new Range<int>(0, 2)));
+            Assert.True(range.Intersects(new Range<int>(0, 11)));
+            Assert.True(range.Intersects(new Range<int>(9, 11)));
+            Assert.True(range.Intersects(new Range<int>(1, 9)));
+            Assert.False(range.Intersects(new Range<int>(-1, 0)));
+            Assert.False(range.Intersects(new Range<int>(11, 12)));
+        }
+
+        [Fact]
+        public void WhenUnionRange_ShouldBeExpectedMinAndMax()
+        {
+            // Arrange
+            var range1 = new Range<int>(1, 6);
+            var range2 = new Range<int>(3, 10);
+
+            // Act
+            var union = range1.Union(range2);
+
+            // Assert
+            Assert.Equal(1, union.Minimum);
+            Assert.Equal(10, union.Maximum);
+        }
+
+        [Fact]
+        public void WhenDifferentInclusivity_Contains_ShouldBeExpected()
+        {
+            var range1 = new Range<int>(1, 10) { Inclusivity = RangeInclusivity.ExclusiveMinExclusiveMax };
+            var range2 = new Range<int>(1, 10) { Inclusivity = RangeInclusivity.ExclusiveMinInclusiveMax };
+            var range3 = new Range<int>(1, 10) { Inclusivity = RangeInclusivity.InclusiveMinExclusiveMax };
+            var range4 = new Range<int>(1, 10) { Inclusivity = RangeInclusivity.InclusiveMinInclusiveMax };
+
+            Assert.False(range1.Contains(1));
+            Assert.False(range1.Contains(10));
+
+            Assert.False(range2.Contains(1));
+            Assert.True(range2.Contains(10));
+
+            Assert.True(range3.Contains(1));
+            Assert.False(range3.Contains(10));
+
+            Assert.True(range4.Contains(1));
+            Assert.True(range4.Contains(10));
+        }
+
+        [Fact]
+        public void WhenFilterQuertable_ShouldBeExpected()
+        {
+            var range = new Range<int>(3, 6);
+            var queryable = Enumerable
+                .Range(1, 10)
+                .Select(i => (intVal: i, strVal: i.ToString()))
+                .AsQueryable();
+            var actual = queryable.FilterByRange(a => a.intVal, range);
+
+            Assert.Equal(
+                new[] {
+                    (3, "3"),
+                    (4, "4"),
+                    (5, "5"),
+                    (6, "6")
+                },
+                actual
+            );
         }
     }
 }

@@ -58,8 +58,8 @@ var range2 = new Range<int>(3,10);
 
 var union = range1.Union(range2);
 
-Assert.Equal(1, union.Miniumum);
-Assert.Equal(2, union.Maximum);
+Assert.Equal(1, union.Minimum);
+Assert.Equal(10, union.Maximum);
 ```
 
 ## Advanced Usage
@@ -70,22 +70,22 @@ A range may specfy inclusivity/exclusivity of the minimum and maximum values usi
 
 ``` c#
 
-var range1 = new Range<int>(1,10) { Inclusivity = ExclusiveMinExclusiveMax };
-var range2 = new Range<int>(1,10) { Inclusivity = ExclusiveMinInclusiveMax };
-var range3 = new Range<int>(1,10) { Inclusivity = InclusiveMinExclusiveMax };
-var range4 = new Range<int>(1,10) { Inclusivity = InclusiveMinInclusiveMax };
+var range1 = new Range<int>(1,10) { Inclusivity = RangeInclusivity.ExclusiveMinExclusiveMax };
+var range2 = new Range<int>(1,10) { Inclusivity = RangeInclusivity.ExclusiveMinInclusiveMax };
+var range3 = new Range<int>(1,10) { Inclusivity = RangeInclusivity.InclusiveMinExclusiveMax };
+var range4 = new Range<int>(1,10) { Inclusivity = RangeInclusivity.InclusiveMinInclusiveMax };
 
 Assert.False(range1.Contains(1));
 Assert.False(range1.Contains(10));
 
-Assert.True(range2.Contains(1))
-Assert.False(range2.Contains(10))
+Assert.False(range2.Contains(1));
+Assert.True(range2.Contains(10));
 
-Assert.True(range3.Contains(1))
-Assert.False(range3.Contains(10))
+Assert.True(range3.Contains(1));
+Assert.False(range3.Contains(10));
 
-Assert.True(range4.Contains(1))
-Assert.True(range4.Contains(10))
+Assert.True(range4.Contains(1));
+Assert.True(range4.Contains(10));
 ```
 
 ### IQueryable filtering
