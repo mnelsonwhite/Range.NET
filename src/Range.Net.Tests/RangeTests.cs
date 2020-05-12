@@ -279,11 +279,13 @@ namespace Range.Net.Tests
         [Fact]
         public void WhenDifferentInclusivity_Contains_ShouldBeExpected()
         {
+            // Arrange
             var range1 = new Range<int>(1, 10) { Inclusivity = RangeInclusivity.ExclusiveMinExclusiveMax };
             var range2 = new Range<int>(1, 10) { Inclusivity = RangeInclusivity.ExclusiveMinInclusiveMax };
             var range3 = new Range<int>(1, 10) { Inclusivity = RangeInclusivity.InclusiveMinExclusiveMax };
             var range4 = new Range<int>(1, 10) { Inclusivity = RangeInclusivity.InclusiveMinInclusiveMax };
 
+            // Act Assert
             Assert.False(range1.Contains(1));
             Assert.False(range1.Contains(10));
 
@@ -298,15 +300,19 @@ namespace Range.Net.Tests
         }
 
         [Fact]
-        public void WhenFilterQuertable_ShouldBeExpected()
+        public void WhenFilterQueryable_ShouldBeExpected()
         {
+            // Arrange
             var range = new Range<int>(3, 6);
             var queryable = Enumerable
                 .Range(1, 10)
                 .Select(i => (intVal: i, strVal: i.ToString()))
                 .AsQueryable();
+
+            // Act
             var actual = queryable.FilterByRange(a => a.intVal, range);
 
+            // Assert
             Assert.Equal(
                 new[] {
                     (3, "3"),
@@ -316,6 +322,89 @@ namespace Range.Net.Tests
                 },
                 actual
             );
+        }
+
+        [Theory]
+        [InlineData(RangeInclusivity.ExclusiveMinExclusiveMax, 4, 6, -1, false)]
+        [InlineData(RangeInclusivity.ExclusiveMinExclusiveMax, 4, 6, 2, false)]
+        [InlineData(RangeInclusivity.ExclusiveMinExclusiveMax, 4, 6, 4, false)]
+        [InlineData(RangeInclusivity.ExclusiveMinExclusiveMax, 4, 6, 5, false)]
+        [InlineData(RangeInclusivity.ExclusiveMinExclusiveMax, 4, 6, 6, true)]
+        [InlineData(RangeInclusivity.ExclusiveMinExclusiveMax, 4, 6, 7, true)]
+        [InlineData(RangeInclusivity.ExclusiveMinInclusiveMax, 4, 6, -1, false)]
+        [InlineData(RangeInclusivity.ExclusiveMinInclusiveMax, 4, 6, 2, false)]
+        [InlineData(RangeInclusivity.ExclusiveMinInclusiveMax, 4, 6, 4, false)]
+        [InlineData(RangeInclusivity.ExclusiveMinInclusiveMax, 4, 6, 5, false)]
+        [InlineData(RangeInclusivity.ExclusiveMinInclusiveMax, 4, 6, 6, false)]
+        [InlineData(RangeInclusivity.ExclusiveMinInclusiveMax, 4, 6, 7, true)]
+        
+        public void WhenLessThan_ShouldBeExpected(RangeInclusivity inclusivity, int min, int max, int value, bool expected)
+        {
+            // Arrange
+            var range = new Range<int>(min, max) { Inclusivity = inclusivity };
+
+            // Act
+            var actual = range.LessThan(value);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Theory]
+        [InlineData(RangeInclusivity.ExclusiveMinExclusiveMax, 4, 6, -1, true)]
+        [InlineData(RangeInclusivity.ExclusiveMinExclusiveMax, 4, 6, 2, true)]
+        [InlineData(RangeInclusivity.ExclusiveMinExclusiveMax, 4, 6, 4, true)]
+        [InlineData(RangeInclusivity.ExclusiveMinExclusiveMax, 4, 6, 5, false)]
+        [InlineData(RangeInclusivity.ExclusiveMinExclusiveMax, 4, 6, 6, false)]
+        [InlineData(RangeInclusivity.ExclusiveMinExclusiveMax, 4, 6, 7, false)]
+        [InlineData(RangeInclusivity.InclusiveMinExclusiveMax, 4, 6, -1, true)]
+        [InlineData(RangeInclusivity.InclusiveMinExclusiveMax, 4, 6, 2, true)]
+        [InlineData(RangeInclusivity.InclusiveMinExclusiveMax, 4, 6, 4, false)]
+        [InlineData(RangeInclusivity.InclusiveMinExclusiveMax, 4, 6, 5, false)]
+        [InlineData(RangeInclusivity.InclusiveMinExclusiveMax, 4, 6, 6, false)]
+        [InlineData(RangeInclusivity.InclusiveMinExclusiveMax, 4, 6, 7, false)]
+        public void WhenGreaterThan_ShouldBeExpected(RangeInclusivity inclusivity, int min, int max, int value, bool expected)
+        {
+            // Arrange
+            var range = new Range<int>(min, max) { Inclusivity = inclusivity };
+
+            // Act
+            var actual = range.GreaterThan(value);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Theory]
+        [InlineData(1, 1)]
+        [InlineData(4, 0)]
+        [InlineData(5, 0)]
+        [InlineData(6, 0)]
+        [InlineData(7, -1)]
+        public void WhenCompareTo_ShouldBeExpected(int value, int expected)
+        {
+            // Arrange
+            var range = new Range<int>(4, 6);
+
+            // Act
+            var actual = range.CompareTo(value);
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Theory]
+        [InlineData(1, 2)]
+        public void WhenInitialize_ShouldBeExpected(int min, int max)
+        {
+            var range = new Range<int>()
+            {
+                Minimum = min,
+                Maximum = max
+            };
+
+            Assert.Equal(min, range.Minimum);
+            Assert.Equal(max, range.Maximum);
         }
     }
 }

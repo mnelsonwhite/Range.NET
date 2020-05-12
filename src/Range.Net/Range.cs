@@ -10,8 +10,8 @@ namespace Range.Net
     /// <typeparam name="T">Constrained to IComparable</typeparam>
     public sealed class Range<T> : IRange<T> where T : IComparable<T>
     {
-        private T _minimum;
-        private T _maximum;
+        private Settable<T> _minimum;
+        private Settable<T> _maximum;
         
         /// <summary>
         /// Default Inclusivity is set to InclusiveMinInclusiveMax
@@ -19,6 +19,8 @@ namespace Range.Net
         public Range()
         {
             Inclusivity = RangeInclusivity.InclusiveMinInclusiveMax;
+            _minimum = new Settable<T>();
+            _maximum = new Settable<T>();
         }
 
         /// <param name="minimum">Minimum value</param>
@@ -26,8 +28,8 @@ namespace Range.Net
         public Range(T minimum, T maximum) : this()
         {
             var reverse = minimum.CompareTo(maximum) > 0;
-            _minimum = reverse ? maximum : minimum;
-            _maximum = reverse ? minimum : maximum;
+            _minimum = new Settable<T>(reverse ? maximum : minimum);
+            _maximum = new Settable<T>(reverse ? minimum : maximum);
         }
 
         /// <summary>
@@ -35,17 +37,17 @@ namespace Range.Net
         /// </summary>
         public T Minimum
         {
-            get => _minimum;
+            get => _minimum.Value;
             set
             {
-                if (value.CompareTo(Maximum) > 0)
+                if (_minimum.IsSet && _maximum.IsSet && value.CompareTo(Maximum) > 0)
                 {
-                    _minimum = _maximum;
-                    _maximum = value;
+                    _minimum.Value = _maximum.Value;
+                    _maximum.Value = value;
                 }
                 else
                 {
-                    _minimum = value;
+                    _minimum.Value = value;
                 }
             }
         }
@@ -55,17 +57,17 @@ namespace Range.Net
         /// </summary>
         public T Maximum
         {
-            get => _maximum;
+            get => _maximum.Value;
             set
             {
-                if (Minimum.CompareTo(value) > 0)
+                if (_minimum.IsSet && _maximum.IsSet && Minimum.CompareTo(value) > 0)
                 {
-                    _maximum = _minimum;
-                    _minimum = value;
+                    _maximum.Value = _minimum.Value;
+                    _minimum.Value = value;
                 }
                 else
                 {
-                    _maximum = value;
+                    _maximum.Value = value;
                 }
             }
         }

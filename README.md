@@ -1,6 +1,6 @@
 ﻿# Range.NET
 [![Build Status](https://atlanticblue.visualstudio.com/Range.NET/_apis/build/status/mnelsonwhite.Range.NET?branchName=master)](https://atlanticblue.visualstudio.com/Range.NET/_build/latest?definitionId=2&branchName=master)
-[![Nuget](https://img.shields.io/badge/nuget-v1.1.0-blue.svg)](https://www.nuget.org/packages/Range.Net)
+[![Nuget](https://img.shields.io/badge/nuget-v1.3.2-blue.svg)](https://www.nuget.org/packages/Range.Net)
 
 Range allows comparable types to be used as a range.
 
@@ -62,11 +62,34 @@ Assert.Equal(1, union.Minimum);
 Assert.Equal(10, union.Maximum);
 ```
 
+### Greater/Less Than
+
+``` c#
+var range = new Range<int>(4,6);
+
+Assert.True(range.LessThan(7));
+Assert.False(range.LessThan(5));
+Assert.True(range.GreaterThan(3));
+Assert.False(range.GreaterThan(4));
+```
+
+### Compare To
+
+``` c#
+var range1 = new Range<int>(4,6);
+
+Assert.Equal(-1, range1.CompareTo(1));
+Assert.Equal(0, range1.CompareTo(4));
+Assert.Equal(0, range1.CompareTo(5));
+Assert.Equal(0, range1.CompareTo(6));
+Assert.Equal(1, range1.CompareTo(7));
+```
+
 ## Advanced Usage
 
 
 ### Inclusivity/Exclusivity
-A range may specfy inclusivity/exclusivity of the minimum and maximum values using the `Inclusivity` property. `InclusiveMinInclusiveMax` the default used by `Range`. 
+A range may specify inclusivity/exclusivity of the minimum and maximum values using the `Inclusivity` property. `InclusiveMinInclusiveMax` the default used by `Range`. 
 
 ``` c#
 

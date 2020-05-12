@@ -5,7 +5,6 @@
 
 trigger:
 - master
-- develop
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -21,7 +20,15 @@ steps:
     command: 'test'
     projects: '**/*.csproj'
     testRunTitle: 'All Tests'
+
 - task: DotNetCoreCLI@2
   inputs:
-    command: 'build'
-    projects: 'src/Range.Net/*.csproj'
+    command: 'pack'
+    packagesToPack: '**/Range.Net.csproj'
+    versioningScheme: 'off'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'package'
+    publishLocation: 'Container'

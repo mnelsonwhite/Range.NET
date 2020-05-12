@@ -6,6 +6,62 @@ namespace Range.Net
     public static class RangeExtensions
     {
         /// <summary>
+        /// Determined hows to range compares to the provided value.
+        /// Less than zero: This range precedes value.
+        /// Zero: This range containes the value.
+        /// Greater than zero: This range follows value.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="range">The range to test</param>
+        /// <param name="value">The value to test</param>
+        /// <returns>
+        /// Less than zero: This range precedes value.
+        /// Zero: This range containes the value.
+        /// Greater than zero: This range follows value.
+        /// </returns>
+        public static int CompareTo<T>(this IRange<T> range, T value)
+            where T : IComparable<T>
+        {
+            if (range.LessThan(value))
+            {
+                return -1;
+            }
+            else if (range.GreaterThan(value)) {
+                return 1;
+            }
+
+            return 0;
+        }
+
+        /// <summary>
+        /// Determines if the range is less than the provided value
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="range">The range to test</param>
+        /// <param name="value">The value to test</param>
+        /// <returns>True of the range is less than the value, else false</returns>
+        public static bool LessThan<T>(this IRange<T> range, T value)
+            where T : IComparable<T>
+        {
+            var maxInclusive = ((int)range.Inclusivity & 1) == 1; // If the first bit set then max is inclusive
+            return maxInclusive ? range.Maximum.CompareTo(value) < 0 : range.Maximum.CompareTo(value) <= 0;
+        }
+
+        /// <summary>
+        /// Determines if the range is greather than the provided value
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="range">The range to test</param>
+        /// <param name="value">The value to test</param>
+        /// <returns>True if the range is greater than the value, else false</returns>
+        public static bool GreaterThan<T>(this IRange<T> range, T value)
+            where T : IComparable<T>
+        {
+            var minInclusive = ((int)range.Inclusivity & 2) == 2; // If the second bit set then min is inclusive
+            return minInclusive ? range.Minimum.CompareTo(value) > 0 : range.Minimum.CompareTo(value) >= 0;
+        }
+
+        /// <summary>
         /// Determines if the provided value is inside the range
         /// </summary>
         /// <param name="range">The range to test</param>
@@ -71,4 +127,5 @@ namespace Range.Net
                 range.Maximum.CompareTo(value.Maximum) > 0 ? range.Maximum : value.Maximum);
         }
     }
+
 }
