@@ -78,11 +78,11 @@ Assert.False(range.GreaterThan(4));
 ``` c#
 var range1 = new Range<int>(4,6);
 
-Assert.Equal(-1, range1.CompareTo(1));
+Assert.Equal(1, range1.CompareTo(1));
 Assert.Equal(0, range1.CompareTo(4));
 Assert.Equal(0, range1.CompareTo(5));
 Assert.Equal(0, range1.CompareTo(6));
-Assert.Equal(1, range1.CompareTo(7));
+Assert.Equal(-1, range1.CompareTo(7));
 ```
 
 ## Advanced Usage
