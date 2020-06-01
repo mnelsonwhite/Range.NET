@@ -8,25 +8,19 @@ namespace Range.Net
     /// Inclusivity is set for min and max by default
     /// </summary>
     /// <typeparam name="T">Constrained to IComparable</typeparam>
-    public sealed class Range<T> : IRange<T> where T : IComparable<T>
+    public struct Range<T> : IRange<T> where T : IComparable<T>
     {
         private Settable<T> _minimum;
         private Settable<T> _maximum;
-        
-        /// <summary>
-        /// Default Inclusivity is set to InclusiveMinInclusiveMax
-        /// </summary>
-        public Range()
-        {
-            Inclusivity = RangeInclusivity.InclusiveMinInclusiveMax;
-            _minimum = new Settable<T>();
-            _maximum = new Settable<T>();
-        }
 
         /// <param name="minimum">Minimum value</param>
         /// <param name="maximum">Maximum value</param>
-        public Range(T minimum, T maximum) : this()
+        public Range(
+            T minimum,
+            T maximum,
+            RangeInclusivity inclusivity = RangeInclusivity.InclusiveMinInclusiveMax)
         {
+            Inclusivity = inclusivity;
             var reverse = minimum.CompareTo(maximum) > 0;
             _minimum = new Settable<T>(reverse ? maximum : minimum);
             _maximum = new Settable<T>(reverse ? minimum : maximum);
@@ -101,11 +95,11 @@ namespace Range.Net
         {
             if (ReferenceEquals(this, obj)) return true;
 
-            var val = obj as Range<T>;
+            var val = obj as Range<T>?;
             return !ReferenceEquals(val, null) &&
-                Minimum.CompareTo(val.Minimum) == 0 &&
-                Maximum.CompareTo(val.Maximum) == 0 &&
-                Equals(Inclusivity, val.Inclusivity);
+                Minimum.CompareTo(val.Value.Minimum) == 0 &&
+                Maximum.CompareTo(val.Value.Maximum) == 0 &&
+                Equals(Inclusivity, val.Value.Inclusivity);
         }
     }
 }

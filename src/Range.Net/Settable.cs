@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Range.Net
 {
-    internal class Settable<T>
+    internal struct Settable<T>
     {
         private T value;
 
@@ -18,11 +18,6 @@ namespace Range.Net
         }
 
         public bool IsSet { get; private set; }
-
-        public Settable()
-        {
-
-        }
 
         public Settable(T value)
         {
