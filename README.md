@@ -1,6 +1,6 @@
 ﻿# Range.NET
 [![Build Status](https://atlanticblue.visualstudio.com/Range.NET/_apis/build/status/mnelsonwhite.Range.NET?branchName=master)](https://atlanticblue.visualstudio.com/Range.NET/_build/latest?definitionId=2&branchName=master)
-[![Nuget](https://img.shields.io/badge/nuget-v2.0.0-blue.svg)](https://www.nuget.org/packages/Range.Net)
+[![Nuget](https://img.shields.io/badge/nuget-v2.1.0-blue.svg)](https://www.nuget.org/packages/Range.Net)
 
 Range allows comparable types to be used as a range.
 
