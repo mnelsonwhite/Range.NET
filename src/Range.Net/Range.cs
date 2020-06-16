@@ -106,11 +106,14 @@ namespace Range.Net
         {
             if (ReferenceEquals(this, obj)) return true;
 
-            var val = obj as Range<T>?;
-            return !ReferenceEquals(val, null) &&
-                Minimum.CompareTo(val.Value.Minimum) == 0 &&
-                Maximum.CompareTo(val.Value.Maximum) == 0 &&
-                Equals(Inclusivity, val.Value.Inclusivity);
+            if (obj is IRange<T> range)
+            {
+                return Minimum.CompareTo(range.Minimum) == 0 &&
+                Maximum.CompareTo(range.Maximum) == 0 &&
+                Equals(Inclusivity, range.Inclusivity);
+            }
+
+            return false;
         }
     }
 }
