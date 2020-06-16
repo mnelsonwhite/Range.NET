@@ -79,13 +79,24 @@ namespace Range.Net
         {
             return $"[{Minimum} - {Maximum}]"; 
         }
-        
+
         /// <summary>
         /// Override of GetHashCode to allow equality
         /// </summary>
         /// <returns>integer hash code representing the value of this instance</returns>
-        public override int GetHashCode() => HashCode.Combine(Minimum, Maximum, Inclusivity);
+#if NET46
+        public override int GetHashCode()
+        {
+            int hashCode = 1895005077;
+            hashCode *= -1521134295 + Minimum.GetHashCode();
+            hashCode *= -1521134295 + Maximum.GetHashCode();
+            hashCode *= -1521134295 + Inclusivity.GetHashCode();
 
+            return hashCode;
+        }
+#else
+        public override int GetHashCode() => HashCode.Combine(Minimum, Maximum, Inclusivity);
+#endif
         /// <summary>
         /// Use the overridden GetHashCode method to test equality
         /// </summary>
