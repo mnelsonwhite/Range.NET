@@ -15,6 +15,7 @@ namespace Range.Net
 
         /// <param name="minimum">Minimum value</param>
         /// <param name="maximum">Maximum value</param>
+        /// <param name="inclusivity">Range inclusivity</param>
         public Range(
             T minimum,
             T maximum,
@@ -77,7 +78,7 @@ namespace Range.Net
         /// <returns>String representation of the Range</returns>
         public override string ToString()
         {
-            return $"[{Minimum} - {Maximum}]"; 
+            return $"[{Minimum} - {Maximum}]";
         }
 
         /// <summary>
@@ -109,8 +110,8 @@ namespace Range.Net
             if (obj is IRange<T> range)
             {
                 return Minimum.CompareTo(range.Minimum) == 0 &&
-                Maximum.CompareTo(range.Maximum) == 0 &&
-                Equals(Inclusivity, range.Inclusivity);
+                    Maximum.CompareTo(range.Maximum) == 0 &&
+                    Equals(Inclusivity, range.Inclusivity);
             }
 
             return false;
