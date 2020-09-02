@@ -126,6 +126,13 @@ namespace Range.Net
                 range.Minimum.CompareTo(value.Minimum) < 0 ? range.Minimum : value.Minimum,
                 range.Maximum.CompareTo(value.Maximum) > 0 ? range.Maximum : value.Maximum);
         }
+
+        public static IRange<T2> As<T1,T2>(this IRange<T1> range, Func<T1,T2> converter)
+            where T1 : IComparable<T1>
+            where T2 : IComparable<T2>
+        {
+            return new Range<T2>(converter(range.Minimum), converter(range.Maximum), range.Inclusivity);
+        }
     }
 
 }
