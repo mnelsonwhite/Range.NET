@@ -134,5 +134,4 @@ namespace Range.Net
             return new Range<T2>(converter(range.Minimum), converter(range.Maximum), range.Inclusivity);
         }
     }
-
 }

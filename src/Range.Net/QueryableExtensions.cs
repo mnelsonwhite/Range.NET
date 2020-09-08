@@ -25,7 +25,7 @@ namespace Range.Net
             IRange<TProperty> range)
             where TProperty : IComparable<TProperty>
         {
-            return queryable.Where(FilterExpressionByRange(queryable, property, range));
+            return queryable.Where(FilterExpressionByRange(property, range));
         }
 
         /// <summary>
@@ -43,11 +43,10 @@ namespace Range.Net
             IRange<TProperty> range)
             where TProperty : struct, IComparable<TProperty>
         {
-            return queryable.Where(FilterExpressionByRange(queryable, property, range));
+            return queryable.Where(FilterExpressionByRange(property, range));
         }
 
         public static Expression<Func<TEntity, bool>> FilterExpressionByRange<TEntity, TProperty>(
-            this IQueryable<TEntity> queryable,
             Expression<Func<TEntity, TProperty>> property,
             IRange<TProperty> range)
             where TProperty : IComparable<TProperty>
@@ -63,7 +62,6 @@ namespace Range.Net
         }
 
         public static Expression<Func<TEntity, bool>> FilterExpressionByRange<TEntity, TProperty>(
-            this IQueryable<TEntity> queryable,
             Expression<Func<TEntity, TProperty?>> property,
             IRange<TProperty> range)
             where TProperty : struct, IComparable<TProperty>
