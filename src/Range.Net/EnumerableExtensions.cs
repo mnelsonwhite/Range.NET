@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Range.Net
 {
-    public static class IEnumerableExtensions
+    public static class EnumerableExtensions
     {
         public static IRange<TProperty> Range<TValue, TProperty>(
             this IEnumerable<TValue> enumerable,

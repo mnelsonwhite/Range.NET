@@ -27,6 +27,13 @@ namespace Range.Net
             _maximum = new Settable<T>(reverse ? minimum : maximum);
         }
 
+        public Range(IRange<T> range)
+        {
+            Inclusivity = range.Inclusivity;
+            _minimum = new Settable<T>(range.Minimum);
+            _maximum = new Settable<T>(range.Maximum);
+        }
+
         /// <summary>
         /// Minimum value of the range
         /// </summary>

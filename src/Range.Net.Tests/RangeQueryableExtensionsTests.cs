@@ -32,7 +32,7 @@ namespace Range.Net.Tests
         }
 
         [Fact]
-        public void When_ShouldBe()
+        public void WhenTupleFilterByRange_ShouldBeExpected()
         {
             var range = new Range<int>(3, 6);
             var queryable = Enumerable
@@ -53,7 +53,7 @@ namespace Range.Net.Tests
         }
 
         [Fact]
-        public void WhenFilterByRange_ShouldBeExpected()
+        public void WhenComplexFilterByRange_ShouldBeExpected()
         {
             // Arrange
             var range = new Range<DateTime>(new DateTime(2001, 1, 1), new DateTime(2001, 1, 3))
@@ -109,6 +109,32 @@ namespace Range.Net.Tests
 
             // Assert
             Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void When_ShouleBe()
+        {
+            // Arrange
+            var range = new Range<int>(3, 6);
+            var queryable = Enumerable
+                .Range(1, 10)
+                .Select(i => new ProtectedPropertyClass(i))
+                .AsQueryable();
+
+            // Act
+            var actual = queryable.FilterByRange(q => q.Value, range);
+
+            // Assert
+            Assert.Equal(4, actual.Count());
+        }
+
+        internal class ProtectedPropertyClass
+        {
+            public ProtectedPropertyClass(int value)
+            {
+                Value = value;
+            }
+            public int Value { get; protected set; }
         }
 
         internal class TestClass
