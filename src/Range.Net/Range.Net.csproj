@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1;net46</TargetFrameworks>
+    <TargetFrameworks>net5.0;netstandard2.1;net46</TargetFrameworks>
     <Authors>Matthew Nelson-White</Authors>
     <Company />
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
@@ -12,7 +12,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <NeutralLanguage>en-AU</NeutralLanguage>
-    <Version>2.3.3</Version>
+    <Version>2.4.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

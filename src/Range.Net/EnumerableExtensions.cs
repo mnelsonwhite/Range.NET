@@ -28,6 +28,42 @@ namespace Range.Net
             );
         }
 
+        public static IEnumerable<TValue> FilterByRange<TValue, TProperty>(
+            this IEnumerable<TValue> enumerable,
+            Func<TValue, TProperty> property,
+            IRange<TProperty> range) where TProperty : IComparable<TProperty>
+        {
+            return enumerable
+                .Where(v => {
+                    var compare = property(v).CompareTo(range.Minimum);
+                    switch (range.Inclusivity)
+                    {
+                        case RangeInclusivity.ExclusiveMinExclusiveMax:
+                        case RangeInclusivity.ExclusiveMinInclusiveMax:
+                            return compare > 0;
+                        case RangeInclusivity.InclusiveMinExclusiveMax:
+                        case RangeInclusivity.InclusiveMinInclusiveMax:
+                            return compare >= 0;
+                        default:
+                            throw new InvalidOperationException("Unhandled inclusivity");
+                    }
+                })
+                .Where(v => {
+                    var compare = property(v).CompareTo(range.Maximum);
+                    switch (range.Inclusivity)
+                    {
+                        case RangeInclusivity.ExclusiveMinExclusiveMax:
+                        case RangeInclusivity.InclusiveMinExclusiveMax:
+                            return compare < 0;
+                        case RangeInclusivity.ExclusiveMinInclusiveMax:
+                        case RangeInclusivity.InclusiveMinInclusiveMax:
+                            return compare <= 0;
+                        default:
+                            throw new InvalidOperationException("Unhandled inclusivity");
+                    }
+                });
+        }
+
         private class MutablePair<T>
         {
             public T Value1 { get; set; }

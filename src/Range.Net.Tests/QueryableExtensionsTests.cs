@@ -5,11 +5,11 @@ using Xunit;
 
 namespace Range.Net.Tests
 {
-    public class RangeQueryableExtensionsTests
+    public class QueryableExtensionsTests
     {
         private readonly IQueryable<TestClass> _values;
 
-        public RangeQueryableExtensionsTests()
+        public QueryableExtensionsTests()
         {
             _values = new[]
             {
@@ -112,7 +112,7 @@ namespace Range.Net.Tests
         }
 
         [Fact]
-        public void When_ShouleBe()
+        public void WhenFilterByRange_ShouleBeExpected()
         {
             // Arrange
             var range = new Range<int>(3, 6);
