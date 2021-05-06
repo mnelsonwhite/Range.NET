@@ -112,8 +112,6 @@ namespace Range.Net
         /// <returns>True if both object have the same hash code value</returns>
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(this, obj)) return true;
-
             if (obj is IRange<T> range)
             {
                 return Minimum.CompareTo(range.Minimum) == 0 &&

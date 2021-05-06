@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Range.Net
+﻿namespace Range.Net
 {
     internal struct Settable<T>
     {

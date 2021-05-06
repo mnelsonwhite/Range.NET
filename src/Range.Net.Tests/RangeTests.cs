@@ -397,12 +397,14 @@ namespace Range.Net.Tests
         [InlineData(1, 2)]
         public void WhenInitialize_ShouldBeExpected(int min, int max)
         {
+            // Arrange, Act
             var range = new Range<int>()
             {
                 Minimum = min,
                 Maximum = max
             };
 
+            // Assert
             Assert.Equal(min, range.Minimum);
             Assert.Equal(max, range.Maximum);
         }
