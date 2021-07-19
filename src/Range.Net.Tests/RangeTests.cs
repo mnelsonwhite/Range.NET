@@ -191,11 +191,11 @@ namespace Range.Net.Tests
         }
 
         [Theory]
-        [InlineData(1, 4, 2, 3, true)]
-        public void WhenRangeContainsRange_ShouldBeExpected(
+        [InlineData(1, 4, 2, 3)]
+        [InlineData(1, 4, 1, 4)]
+        public void WhenRangeContainsRange_ContainsShouldBeTrue(
             int r1Min, int r1Max,
-            int r2Min, int r2Max,
-            bool expected)
+            int r2Min, int r2Max)
         {
             // Arrange
             var r1 = new Range<int>(r1Min, r1Max);
@@ -205,7 +205,46 @@ namespace Range.Net.Tests
             var actual = r1.Contains(r2);
 
             // Assert
-            Assert.Equal(expected, actual);
+            Assert.True(actual);
+        }
+
+        [Theory]
+        [InlineData(RangeInclusivity.ExclusiveMinExclusiveMax)]
+        [InlineData(RangeInclusivity.ExclusiveMinInclusiveMax)]
+        [InlineData(RangeInclusivity.InclusiveMinExclusiveMax)]
+        [InlineData(RangeInclusivity.InclusiveMinInclusiveMax)]
+        public void WhenAnyInclusivity_RangeShouldContainItself(RangeInclusivity inclusivity)
+        {
+            // Arrange
+            var range = new Range<int>(1, 4, inclusivity);
+
+            // Act
+            var actual = range.Contains(range);
+
+            // Assert
+            Assert.True(actual);
+        }
+
+        [Theory]
+        [InlineData(RangeInclusivity.InclusiveMinExclusiveMax, RangeInclusivity.InclusiveMinInclusiveMax)]
+        [InlineData(RangeInclusivity.InclusiveMinExclusiveMax, RangeInclusivity.ExclusiveMinInclusiveMax)]
+
+        [InlineData(RangeInclusivity.ExclusiveMinExclusiveMax, RangeInclusivity.ExclusiveMinInclusiveMax)]
+        [InlineData(RangeInclusivity.ExclusiveMinExclusiveMax, RangeInclusivity.InclusiveMinExclusiveMax)]
+
+        [InlineData(RangeInclusivity.ExclusiveMinInclusiveMax, RangeInclusivity.InclusiveMinExclusiveMax)]
+        [InlineData(RangeInclusivity.ExclusiveMinInclusiveMax, RangeInclusivity.InclusiveMinInclusiveMax)]
+        public void WhenSameRange_ExclusiveShouldNotContainInclusive(RangeInclusivity r1Inc, RangeInclusivity r2Inc)
+        {
+            // Arrange
+            var r1 = new Range<int>(1, 4, r1Inc);
+            var r2 = new Range<int>(1, 4, r2Inc);
+
+            // Act
+            var actual = r1.Contains(r2);
+
+            // Assert
+            Assert.False(actual);
         }
 
         [Fact]

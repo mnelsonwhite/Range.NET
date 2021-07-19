@@ -88,7 +88,14 @@ namespace Range.Net
         public static bool Contains<T>(this IRange<T> range, IRange<T> value)
             where T : IComparable<T>
         {
-            return range.Contains(value.Minimum) && range.Contains(value.Maximum);
+            var rangeMinInclusive = ((int)range.Inclusivity & 2) == 2;
+            var valueMinInclusive = ((int)value.Inclusivity & 2) == 2;
+            var rangeMaxInclusive = ((int)range.Inclusivity & 1) == 1;
+            var valueMaxInclusive = ((int)value.Inclusivity & 1) == 1;
+
+            return
+                (rangeMinInclusive || rangeMinInclusive == valueMinInclusive) && range.Minimum.CompareTo(value.Minimum) <= 0 &&
+                (rangeMaxInclusive || rangeMaxInclusive == valueMaxInclusive) && range.Maximum.CompareTo(value.Maximum) >= 0;
         }
 
         /// <summary>
