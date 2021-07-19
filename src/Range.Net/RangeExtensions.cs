@@ -88,10 +88,7 @@ namespace Range.Net
         public static bool Contains<T>(this IRange<T> range, IRange<T> value)
             where T : IComparable<T>
         {
-            return range.Contains(value.Minimum) // For when A contains B
-                   || range.Contains(value.Maximum)
-                   || value.Contains(range.Minimum) // For when B contains A
-                   || value.Contains(range.Maximum);
+            return range.Contains(value.Minimum) && range.Contains(value.Maximum);
         }
 
         /// <summary>

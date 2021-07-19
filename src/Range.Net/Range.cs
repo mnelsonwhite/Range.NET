@@ -114,7 +114,9 @@ namespace Range.Net
         {
             if (obj is IRange<T> range)
             {
-                return Minimum.CompareTo(range.Minimum) == 0 &&
+                return
+                    ReferenceEquals(this, range) ||
+                    Minimum.CompareTo(range.Minimum) == 0 &&
                     Maximum.CompareTo(range.Maximum) == 0 &&
                     Equals(Inclusivity, range.Inclusivity);
             }
