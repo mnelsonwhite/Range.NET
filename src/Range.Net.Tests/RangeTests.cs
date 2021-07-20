@@ -90,18 +90,26 @@ namespace Range.Net.Tests
         }
 
         [Theory]
-        [InlineData(1, 2, 3, 4, false)]
-        [InlineData(3, 4, 1, 2, false)]
-        [InlineData(1, 1, 2, 2, false)]
-        [InlineData(1, 4, 2, 3, true)]
-        [InlineData(2, 3, 1, 4, true)]
-        [InlineData(1, 3, 2, 4, true)]
-        [InlineData(2, 4, 1, 3, true)]
-        public void WhenIntersects_ShouldBeInsectingRange(int aMin, int aMax, int bMin, int bMax, bool expected)
+        [InlineData(1, 2, 2, 3, RangeInclusivity.InclusiveMinInclusiveMax, true)]
+        [InlineData(1, 2, 2, 3, RangeInclusivity.ExclusiveMinExclusiveMax, false)]
+        [InlineData(1, 2, 2, 3, RangeInclusivity.ExclusiveMinInclusiveMax, false)]
+        [InlineData(1, 2, 2, 3, RangeInclusivity.InclusiveMinExclusiveMax, false)]
+
+        [InlineData(2, 3, 1, 2, RangeInclusivity.InclusiveMinInclusiveMax, true)]
+        [InlineData(2, 3, 1, 2, RangeInclusivity.ExclusiveMinExclusiveMax, false)]
+        [InlineData(2, 3, 1, 2, RangeInclusivity.ExclusiveMinInclusiveMax, false)]
+        [InlineData(2, 3, 1, 2, RangeInclusivity.InclusiveMinExclusiveMax, false)]
+        public void WhenIntersects_ShouldBeInsectingRange(
+            int aMin,
+            int aMax,
+            int bMin,
+            int bMax,
+            RangeInclusivity inclusivity,
+            bool expected)
         {
             // Arrange
-            var aRange = new Range<int>(aMin, aMax);
-            var bRange = new Range<int>(bMin, bMax);
+            var aRange = new Range<int>(aMin, aMax, inclusivity);
+            var bRange = new Range<int>(bMin, bMax, inclusivity);
 
             // Act
             var actual = aRange.Intersects(bRange);
@@ -111,28 +119,27 @@ namespace Range.Net.Tests
         }
 
         [Theory]
-        [InlineData(1, 2, 3, 4, 1, 4)]
-        [InlineData(1, 1, 4, 4, 1, 4)]
-        [InlineData(4, 4, 1, 1, 1, 4)]
-        [InlineData(1, 3, 2, 4, 1, 4)]
-        public void WhenRangesCombined_ShouldBeUnion(
+        [InlineData(1, 2, 3, 4, RangeInclusivity.InclusiveMinInclusiveMax)]
+        [InlineData(1, 1, 4, 4, RangeInclusivity.InclusiveMinInclusiveMax)]
+        [InlineData(1, 2, 2, 3, RangeInclusivity.ExclusiveMinExclusiveMax)]
+        [InlineData(1, 2, 2, 3, RangeInclusivity.ExclusiveMinInclusiveMax)]
+        [InlineData(1, 2, 2, 3, RangeInclusivity.InclusiveMinExclusiveMax)]
+        public void WhenRangesCombined_ShouldBeIntersect(
             int aMin,
             int aMax,
             int bMin,
             int bMax,
-            int expectedMin,
-            int expectedMax)
+            RangeInclusivity inclusivity)
         {
             // Arrange
-            var aRange = new Range<int>(aMin, aMax);
-            var bRange = new Range<int>(bMin, bMax);
-            var expected = new Range<int>(expectedMin, expectedMax);
+            var aRange = new Range<int>(aMin, aMax, inclusivity);
+            var bRange = new Range<int>(bMin, bMax, inclusivity);
 
             // Act
-            var actual = aRange.Union(bRange);
+            var actual = aRange.TryIntersect(bRange, out _);
 
             // Assert
-            Assert.Equal(expected, actual);
+            Assert.False(actual);
         }
 
         [Fact]
@@ -191,21 +198,77 @@ namespace Range.Net.Tests
         }
 
         [Theory]
-        [InlineData(1, 4, 2, 3)]
-        [InlineData(1, 4, 1, 4)]
+        [InlineData(1, 4, RangeInclusivity.InclusiveMinInclusiveMax, 2, 3, RangeInclusivity.InclusiveMinInclusiveMax)]
+        [InlineData(1, 4, RangeInclusivity.InclusiveMinInclusiveMax, 1, 4, RangeInclusivity.InclusiveMinInclusiveMax)]
+        [InlineData(1, 4, RangeInclusivity.InclusiveMinInclusiveMax, 2, 3, RangeInclusivity.ExclusiveMinExclusiveMax)]
+        [InlineData(1, 4, RangeInclusivity.InclusiveMinInclusiveMax, 1, 4, RangeInclusivity.ExclusiveMinExclusiveMax)]
+        [InlineData(1, 4, RangeInclusivity.InclusiveMinInclusiveMax, 2, 3, RangeInclusivity.ExclusiveMinInclusiveMax)]
+        [InlineData(1, 4, RangeInclusivity.InclusiveMinInclusiveMax, 1, 4, RangeInclusivity.ExclusiveMinInclusiveMax)]
+        [InlineData(1, 4, RangeInclusivity.InclusiveMinInclusiveMax, 2, 3, RangeInclusivity.InclusiveMinExclusiveMax)]
+        [InlineData(1, 4, RangeInclusivity.InclusiveMinInclusiveMax, 1, 4, RangeInclusivity.InclusiveMinExclusiveMax)]
+        [InlineData(1, 4, RangeInclusivity.ExclusiveMinExclusiveMax, 2, 3, RangeInclusivity.InclusiveMinInclusiveMax)]
+        [InlineData(1, 4, RangeInclusivity.ExclusiveMinExclusiveMax, 2, 3, RangeInclusivity.ExclusiveMinInclusiveMax)]
+        [InlineData(1, 4, RangeInclusivity.ExclusiveMinExclusiveMax, 2, 3, RangeInclusivity.InclusiveMinExclusiveMax)]
+        [InlineData(1, 4, RangeInclusivity.ExclusiveMinExclusiveMax, 2, 3, RangeInclusivity.ExclusiveMinExclusiveMax)]
+        [InlineData(1, 4, RangeInclusivity.ExclusiveMinExclusiveMax, 1, 4, RangeInclusivity.ExclusiveMinExclusiveMax)]
+        [InlineData(1, 4, RangeInclusivity.ExclusiveMinInclusiveMax, 2, 3, RangeInclusivity.InclusiveMinInclusiveMax)]
+        [InlineData(1, 4, RangeInclusivity.ExclusiveMinInclusiveMax, 2, 3, RangeInclusivity.ExclusiveMinInclusiveMax)]
+        [InlineData(1, 4, RangeInclusivity.ExclusiveMinInclusiveMax, 2, 3, RangeInclusivity.InclusiveMinExclusiveMax)]
+        [InlineData(1, 4, RangeInclusivity.ExclusiveMinInclusiveMax, 2, 3, RangeInclusivity.ExclusiveMinExclusiveMax)]
+        [InlineData(1, 4, RangeInclusivity.ExclusiveMinInclusiveMax, 1, 4, RangeInclusivity.ExclusiveMinInclusiveMax)]
+        [InlineData(1, 4, RangeInclusivity.InclusiveMinExclusiveMax, 2, 3, RangeInclusivity.InclusiveMinInclusiveMax)]
+        [InlineData(1, 4, RangeInclusivity.InclusiveMinExclusiveMax, 2, 3, RangeInclusivity.ExclusiveMinInclusiveMax)]
+        [InlineData(1, 4, RangeInclusivity.InclusiveMinExclusiveMax, 2, 3, RangeInclusivity.InclusiveMinExclusiveMax)]
+        [InlineData(1, 4, RangeInclusivity.InclusiveMinExclusiveMax, 2, 3, RangeInclusivity.ExclusiveMinExclusiveMax)]
+        [InlineData(1, 4, RangeInclusivity.InclusiveMinExclusiveMax, 1, 4, RangeInclusivity.InclusiveMinExclusiveMax)]
         public void WhenRangeContainsRange_ContainsShouldBeTrue(
-            int r1Min, int r1Max,
-            int r2Min, int r2Max)
+            int r1Min, int r1Max, RangeInclusivity r1Inc,
+            int r2Min, int r2Max, RangeInclusivity r2Inc)
         {
             // Arrange
-            var r1 = new Range<int>(r1Min, r1Max);
-            var r2 = new Range<int>(r2Min, r2Max);
+            var r1 = new Range<int>(r1Min, r1Max, r1Inc);
+            var r2 = new Range<int>(r2Min, r2Max, r2Inc);
 
             // Act
             var actual = r1.Contains(r2);
 
             // Assert
             Assert.True(actual);
+        }
+
+        [Theory]
+        [InlineData(1, 4, RangeInclusivity.ExclusiveMinExclusiveMax, 1, 4, RangeInclusivity.ExclusiveMinInclusiveMax)]
+        [InlineData(1, 4, RangeInclusivity.ExclusiveMinExclusiveMax, 1, 4, RangeInclusivity.InclusiveMinExclusiveMax)]
+        [InlineData(1, 4, RangeInclusivity.ExclusiveMinExclusiveMax, 1, 4, RangeInclusivity.InclusiveMinInclusiveMax)]
+        [InlineData(2, 3, RangeInclusivity.ExclusiveMinExclusiveMax, 1, 4, RangeInclusivity.ExclusiveMinExclusiveMax)]
+        [InlineData(2, 3, RangeInclusivity.ExclusiveMinExclusiveMax, 1, 4, RangeInclusivity.ExclusiveMinInclusiveMax)]
+        [InlineData(2, 3, RangeInclusivity.ExclusiveMinExclusiveMax, 1, 4, RangeInclusivity.InclusiveMinExclusiveMax)]
+        [InlineData(2, 3, RangeInclusivity.ExclusiveMinExclusiveMax, 1, 4, RangeInclusivity.InclusiveMinInclusiveMax)]
+        [InlineData(2, 3, RangeInclusivity.ExclusiveMinInclusiveMax, 1, 4, RangeInclusivity.ExclusiveMinExclusiveMax)]
+        [InlineData(2, 3, RangeInclusivity.ExclusiveMinInclusiveMax, 1, 4, RangeInclusivity.ExclusiveMinInclusiveMax)]
+        [InlineData(2, 3, RangeInclusivity.ExclusiveMinInclusiveMax, 1, 4, RangeInclusivity.InclusiveMinExclusiveMax)]
+        [InlineData(2, 3, RangeInclusivity.ExclusiveMinInclusiveMax, 1, 4, RangeInclusivity.InclusiveMinInclusiveMax)]
+        [InlineData(2, 3, RangeInclusivity.InclusiveMinExclusiveMax, 1, 4, RangeInclusivity.ExclusiveMinExclusiveMax)]
+        [InlineData(2, 3, RangeInclusivity.InclusiveMinExclusiveMax, 1, 4, RangeInclusivity.ExclusiveMinInclusiveMax)]
+        [InlineData(2, 3, RangeInclusivity.InclusiveMinExclusiveMax, 1, 4, RangeInclusivity.InclusiveMinExclusiveMax)]
+        [InlineData(2, 3, RangeInclusivity.InclusiveMinExclusiveMax, 1, 4, RangeInclusivity.InclusiveMinInclusiveMax)]
+        [InlineData(2, 3, RangeInclusivity.InclusiveMinInclusiveMax, 1, 4, RangeInclusivity.ExclusiveMinExclusiveMax)]
+        [InlineData(2, 3, RangeInclusivity.InclusiveMinInclusiveMax, 1, 4, RangeInclusivity.ExclusiveMinInclusiveMax)]
+        [InlineData(2, 3, RangeInclusivity.InclusiveMinInclusiveMax, 1, 4, RangeInclusivity.InclusiveMinExclusiveMax)]
+        [InlineData(2, 3, RangeInclusivity.InclusiveMinInclusiveMax, 1, 4, RangeInclusivity.InclusiveMinInclusiveMax)]
+        public void WhenRangeDoesNotContainsRange_ContainsShouldBeFalse(
+            int r1Min, int r1Max, RangeInclusivity r1Inc,
+            int r2Min, int r2Max, RangeInclusivity r2Inc)
+        {
+            // Arrange
+            var r1 = new Range<int>(r1Min, r1Max, r1Inc);
+            var r2 = new Range<int>(r2Min, r2Max, r2Inc);
+
+            // Act
+            var actual = r1.Contains(r2);
+
+            // Assert
+            Assert.False(actual);
         }
 
         [Theory]
@@ -228,10 +291,8 @@ namespace Range.Net.Tests
         [Theory]
         [InlineData(RangeInclusivity.InclusiveMinExclusiveMax, RangeInclusivity.InclusiveMinInclusiveMax)]
         [InlineData(RangeInclusivity.InclusiveMinExclusiveMax, RangeInclusivity.ExclusiveMinInclusiveMax)]
-
         [InlineData(RangeInclusivity.ExclusiveMinExclusiveMax, RangeInclusivity.ExclusiveMinInclusiveMax)]
         [InlineData(RangeInclusivity.ExclusiveMinExclusiveMax, RangeInclusivity.InclusiveMinExclusiveMax)]
-
         [InlineData(RangeInclusivity.ExclusiveMinInclusiveMax, RangeInclusivity.InclusiveMinExclusiveMax)]
         [InlineData(RangeInclusivity.ExclusiveMinInclusiveMax, RangeInclusivity.InclusiveMinInclusiveMax)]
         public void WhenSameRange_ExclusiveShouldNotContainInclusive(RangeInclusivity r1Inc, RangeInclusivity r2Inc)
@@ -285,34 +346,36 @@ namespace Range.Net.Tests
             Assert.False(range.Contains(11));
         }
 
-        [Fact]
-        public void WhenRangeIntersectsWithAnother_ShouldBeExpected()
+        [Theory]
+        [InlineData(0, 2, true)]
+        [InlineData(0, 11, true)]
+        [InlineData(9, 11, true)]
+        [InlineData(1, 9, true)]
+        [InlineData(-1, 0, false)]
+        [InlineData(11, 12, false)]
+        public void WhenRangeIntersectsWithAnother_ShouldBeExpected(int min, int max, bool expected)
         {
             // Arrange
             var range = new Range<int>(1, 10);
 
             // Act Assert
-            Assert.True(range.Intersects(new Range<int>(0, 2)));
-            Assert.True(range.Intersects(new Range<int>(0, 11)));
-            Assert.True(range.Intersects(new Range<int>(9, 11)));
-            Assert.True(range.Intersects(new Range<int>(1, 9)));
-            Assert.False(range.Intersects(new Range<int>(-1, 0)));
-            Assert.False(range.Intersects(new Range<int>(11, 12)));
+            Assert.Equal(expected, range.Intersects(new Range<int>(min, max)));
         }
 
         [Fact]
         public void WhenUnionRange_ShouldBeExpectedMinAndMax()
         {
             // Arrange
-            var range1 = new Range<int>(1, 6);
-            var range2 = new Range<int>(3, 10);
+            var range1 = new Range<int>(1, 6, RangeInclusivity.ExclusiveMinExclusiveMax);
+            var range2 = new Range<int>(3, 10, RangeInclusivity.InclusiveMinInclusiveMax);
 
             // Act
-            var union = range1.Union(range2);
+            var actual = range1.TryIntersect(range2, out var actualUnioned);
 
             // Assert
-            Assert.Equal(1, union.Minimum);
-            Assert.Equal(10, union.Maximum);
+            Assert.True(actual);
+            Assert.Equal(3, actualUnioned.Minimum);
+            Assert.Equal(6, actualUnioned.Maximum);
         }
 
         [Fact]

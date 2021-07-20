@@ -80,7 +80,8 @@ namespace Range.Net
         }
 
         /// <summary>
-        /// Determines if another range is inside the bounds of this range
+        /// Determines if another range is inside the bounds of this range.
+        /// This operations is anticommutative.
         /// </summary>
         /// <param name="range">The range to test</param>
         /// <param name="value">The value to test</param>
@@ -94,8 +95,14 @@ namespace Range.Net
             var valueMaxInclusive = ((int)value.Inclusivity & 1) == 1;
 
             return
-                (rangeMinInclusive || rangeMinInclusive == valueMinInclusive) && range.Minimum.CompareTo(value.Minimum) <= 0 &&
-                (rangeMaxInclusive || rangeMaxInclusive == valueMaxInclusive) && range.Maximum.CompareTo(value.Maximum) >= 0;
+                (
+                    (rangeMinInclusive || rangeMinInclusive == valueMinInclusive) && range.Minimum.CompareTo(value.Minimum) <= 0  ||
+                    range.Minimum.CompareTo(value.Minimum)  < 0
+                ) &&
+                (
+                    (rangeMaxInclusive || rangeMaxInclusive == valueMaxInclusive) && range.Maximum.CompareTo(value.Maximum) >= 0 ||
+                    range.Maximum.CompareTo(value.Maximum) > 0
+                );
         }
 
         /// <summary>
@@ -109,26 +116,117 @@ namespace Range.Net
             where T : IComparable<T>
         {
             return
-                range.Contains(value.Minimum) || // For when A contains B
-                range.Contains(value.Maximum) ||
-                value.Contains(range.Minimum) || // For when B contains A
-                value.Contains(range.Maximum);
+                AnticommunitiveIntersects(range, value) ||
+                AnticommunitiveIntersects(value, range);
+        }
+
+        private static bool AnticommunitiveIntersects<T>(IRange<T> range, IRange<T> value)
+            where T : IComparable<T>
+        {
+            var rangeMinInclusive = ((int)range.Inclusivity & 2) == 2;
+            var valueMinInclusive = ((int)value.Inclusivity & 2) == 2;
+            var rangeMaxInclusive = ((int)range.Inclusivity & 1) == 1;
+            var valueMaxInclusive = ((int)value.Inclusivity & 1) == 1;
+
+            return
+                (
+                    (rangeMinInclusive || rangeMinInclusive == valueMinInclusive) && range.Minimum.CompareTo(value.Minimum) <= 0 ||
+                    range.Minimum.CompareTo(value.Minimum) < 0
+                ) &&
+                (
+                    rangeMaxInclusive && valueMinInclusive && range.Maximum.CompareTo(value.Minimum) >= 0 ||
+                    range.Maximum.CompareTo(value.Minimum) > 0
+                ) ||
+                (
+                    rangeMinInclusive && valueMaxInclusive && range.Minimum.CompareTo(value.Maximum) <= 0 ||
+                    range.Minimum.CompareTo(value.Maximum) < 0
+                ) &&
+                (
+                    (rangeMaxInclusive || rangeMinInclusive == valueMinInclusive) && range.Maximum.CompareTo(value.Maximum) >= 0 ||
+                    range.Maximum.CompareTo(value.Maximum) >= 0
+                );
+        }
+
+        /// <summary>
+        /// Create an intersection of two ranges so that a new range with the minimum of
+        /// the minimum of both ranges and the maximum of the maximum of both ranges.
+        /// If the ranges do not intersect, then the method will return false and the
+        /// out range wll be default.
+        /// </summary>
+        /// <param name="range">A range with which to intersect</param>
+        /// <param name="value">A range with which to intersect</param>
+        /// <param name="intersection">out range which is the intersection of both ranges</param>
+        /// <returns>true if the range intersects and false if not</returns>
+        public static bool TryIntersect<T>(
+            this IRange<T> range,
+            IRange<T> value,
+            out IRange<T> intersection) where T : IComparable<T>
+        {
+            if (!Intersects(range, value))
+            {
+                intersection = default;
+                return false;
+            }
+
+            var rangeMinInclusive = ((int)range.Inclusivity & 2) == 2;
+            var valueMinInclusive = ((int)value.Inclusivity & 2) == 2;
+            var rangeMaxInclusive = ((int)range.Inclusivity & 1) == 1;
+            var valueMaxInclusive = ((int)value.Inclusivity & 1) == 1;
+
+            var minValue = (
+                    (rangeMinInclusive || rangeMinInclusive == valueMinInclusive) && range.Minimum.CompareTo(value.Minimum) <= 0 ||
+                    range.Minimum.CompareTo(value.Minimum) < 0
+                ) ? value.Minimum : range.Minimum;
+
+            var maxValue = (
+                    (rangeMaxInclusive || rangeMaxInclusive == valueMaxInclusive) && range.Maximum.CompareTo(value.Maximum) >= 0 ||
+                    range.Maximum.CompareTo(value.Maximum) > 0
+                ) ? value.Maximum : range.Maximum;
+
+            
+            intersection = new Range<T>(minValue, maxValue);
+            return true;
         }
 
         /// <summary>
         /// Create a union of two ranges so that a new range with the minimum of
-        /// the minimum of both ranges and the maximum of the maximum of bother ranges
+        /// the minimum of both ranges and the maximum of the maximum of both ranges.
+        /// If the ranges do not intersect, then the method will return false and the
+        /// out range wll be default.
         /// </summary>
         /// <param name="range">A range with which to union</param>
         /// <param name="value">A range with which to union</param>
-        /// <returns>A new range with the minimum of the minimum of both ranges and
-        /// the maximum of the maximum of bother ranges</returns>
-        public static IRange<T> Union<T>(this IRange<T> range, IRange<T> value)
-            where T : IComparable<T>
+        /// <param name="intersection">out range which is the intersection of both ranges</param>
+        /// <returns>true if the range intersects and false if not</returns>
+        public static bool TryUnion<T>(
+            this IRange<T> range,
+            IRange<T> value,
+            out IRange<T> intersection) where T : IComparable<T>
         {
-            return new Range<T>(
-                range.Minimum.CompareTo(value.Minimum) < 0 ? range.Minimum : value.Minimum,
-                range.Maximum.CompareTo(value.Maximum) > 0 ? range.Maximum : value.Maximum);
+            if (!Intersects(range, value))
+            {
+                intersection = default;
+                return false;
+            }
+
+            var rangeMinInclusive = ((int)range.Inclusivity & 2) == 2;
+            var valueMinInclusive = ((int)value.Inclusivity & 2) == 2;
+            var rangeMaxInclusive = ((int)range.Inclusivity & 1) == 1;
+            var valueMaxInclusive = ((int)value.Inclusivity & 1) == 1;
+
+            var minValue = (
+                    (rangeMinInclusive || rangeMinInclusive == valueMinInclusive) && range.Minimum.CompareTo(value.Minimum) <= 0 ||
+                    range.Minimum.CompareTo(value.Minimum) < 0
+                ) ? range.Minimum : value.Minimum;
+
+            var maxValue = (
+                    (rangeMaxInclusive || rangeMaxInclusive == valueMaxInclusive) && range.Maximum.CompareTo(value.Maximum) >= 0 ||
+                    range.Maximum.CompareTo(value.Maximum) > 0
+                ) ? range.Maximum : value.Maximum;
+
+
+            intersection = new Range<T>(minValue, maxValue);
+            return true;
         }
 
         public static IRange<T2> As<T1,T2>(this IRange<T1> range, Func<T1,T2> converter)
