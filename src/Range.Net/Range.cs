@@ -92,7 +92,7 @@ namespace Range.Net
         /// Override of GetHashCode to allow equality
         /// </summary>
         /// <returns>integer hash code representing the value of this instance</returns>
-#if NET46
+#if NET48
         public override int GetHashCode()
         {
             int hashCode = 1895005077;
